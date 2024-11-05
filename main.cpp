@@ -1,8 +1,9 @@
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include <iostream>
-#include <unistd.h>
-#include <termios.h>
-#include <cstdlib>
 #include <ctime>
+#include <cstdlib>
+#include <vector>
 
 using namespace std;
 
@@ -10,10 +11,11 @@ bool gameOver;
 const int width = 20;
 const int height = 17;
 int x, y, fruitX, fruitY, score;
-int tailX[100], tailY[100];
+vector<pair<int, int>> tail;
 int nTail;
 enum Direction { STOP = 0, LEFT, RIGHT, UP, DOWN };
 Direction dir;
+bool isPaused = false;
 
 void Setup() {
     gameOver = false;
@@ -23,95 +25,82 @@ void Setup() {
     fruitX = rand() % width;
     fruitY = rand() % height;
     score = 0;
+    nTail = 0;
+    tail.clear();
 }
 
-void Draw(string& playerName) {
-    system("clear");
+void RenderingEngine(sf::RenderWindow &window, sf::Font &font, const string &playerName) {
+    window.clear();
 
-    for (int i = 0; i < width + 2; i++)
-        cout << "-";
-    cout << endl;
-
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if (j == 0)
-                cout << "|";
-
-            if (i == y && j == x)
-                cout << "O";
-            else if (i == fruitY && j == fruitX)
-                cout << "F";
-            else {
-                bool print = false;
-                for (int k = 0; k < nTail; k++) {
-                    if (tailX[k] == j && tailY[k] == i) {
-                        cout << "o";
-                        print = true;
-                    }
-                }
-                if (!print)
-                    cout << " ";
-            }
-
-            if (j == width - 1)
-                cout << "|";
-        }
-        cout << endl;
+    for (int i = 0; i < width + 2; i++) {
+        sf::RectangleShape wall(sf::Vector2f(20, 20));
+        wall.setFillColor(sf::Color::Red);
+        wall.setPosition(i * 20, 0);
+        window.draw(wall);
+        wall.setPosition(i * 20, (height + 1) * 20);
+        window.draw(wall);
+    }
+    for (int i = 0; i < height + 2; i++) {
+        sf::RectangleShape wall(sf::Vector2f(20, 20));
+        wall.setFillColor(sf::Color::Red);
+        wall.setPosition(0, i * 20);
+        window.draw(wall);
+        wall.setPosition((width + 1) * 20, i * 20);
+        window.draw(wall);
     }
 
+    sf::RectangleShape snakeHead(sf::Vector2f(20, 20));
+    snakeHead.setFillColor(sf::Color::Green);
+    snakeHead.setPosition((x + 1) * 20, (y + 1) * 20);
+    window.draw(snakeHead);
 
-    for (int i = 0; i < width + 2; i++)
-        cout << "-";
-    cout << endl;
+    for (auto segment : tail) {
+        sf::RectangleShape tailSegment(sf::Vector2f(20, 20));
+        tailSegment.setFillColor(sf::Color::Yellow);
+        tailSegment.setPosition((segment.first + 1) * 20, (segment.second + 1) * 20);
+        window.draw(tailSegment);
+    }
 
-    cout << playerName << "'s Score: " << score
-         << endl;
+    sf::RectangleShape fruit(sf::Vector2f(20, 20));
+    fruit.setFillColor(sf::Color::Magenta);
+    fruit.setPosition((fruitX + 1) * 20, (fruitY + 1) * 20);
+    window.draw(fruit);
+
+    sf::Text scoreText;
+    scoreText.setFont(font);
+    scoreText.setString(playerName + "'s Score: " + to_string(score));
+    scoreText.setCharacterSize(20);
+    scoreText.setFillColor(sf::Color::White);
+    scoreText.setPosition(10, (height + 2) * 20);
+    window.draw(scoreText);
+
+    window.display();
 }
 
-
-void Logic() {
-    int prevX = tailX[0];
-    int prevY = tailY[0];
-    int prev2X, prev2Y;
-    tailX[0] = x;
-    tailY[0] = y;
-
-    for (int i = 1; i < nTail; i++) {
-        prev2X = tailX[i];
-        prev2Y = tailY[i];
-        tailX[i] = prevX;
-        tailY[i] = prevY;
-        prevX = prev2X;
-        prevY = prev2Y;
+void GameEngine() {
+    if (nTail > 0) {
+        tail.insert(tail.begin(), {x, y});
+        if (tail.size() > nTail) {
+            tail.pop_back();
+        }
     }
 
     switch (dir) {
-        case LEFT:
-            x--;
-            break;
-        case RIGHT:
-            x++;
-            break;
-        case UP:
-            y--;
-            break;
-        case DOWN:
-            y++;
-            break;
-        default:
-            break;
+        case LEFT: x--; break;
+        case RIGHT: x++; break;
+        case UP: y--; break;
+        case DOWN: y++; break;
+        default: break;
     }
 
     if (x >= width) x = 0; else if (x < 0) x = width - 1;
     if (y >= height) y = 0; else if (y < 0) y = height - 1;
 
-
-    for (int i = 0; i < nTail; i++) {
-        if (tailX[i] == x && tailY[i] == y) {
+    for (auto segment : tail) {
+        if (segment.first == x && segment.second == y) {
             gameOver = true;
         }
     }
-
 
     if (x == fruitX && y == fruitY) {
         score += 10;
@@ -121,51 +110,51 @@ void Logic() {
     }
 }
 
-void ChangeDirection(char key) {
-    switch (key) {
-    case 'a':
-        dir = LEFT;
-        break;
-    case 'd':
-        dir = RIGHT;
-        break;
-    case 'w':
-        dir = UP;
-        break;
-    case 's':
-        dir = DOWN;
-        break;
-    case 'i':
-        gameOver = true;
-        break;
+void HandleInput(sf::Event &event) {
+    if (event.type == sf::Event::KeyPressed) {
+        switch (event.key.code) {
+            case sf::Keyboard::A: dir = LEFT; break;
+            case sf::Keyboard::D: dir = RIGHT; break;
+            case sf::Keyboard::W: dir = UP; break;
+            case sf::Keyboard::S: dir = DOWN; break;
+            case sf::Keyboard::P: isPaused = !isPaused; break;
+            case sf::Keyboard::Escape: gameOver = true; break;
+            default: break;
+        }
     }
-}
-
-void Input() {
-    struct termios oldt, newt;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-    if (read(STDIN_FILENO, &dir, 1) == 1) {
-        ChangeDirection(dir);
-    }
-
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 }
 
 int main() {
+    srand(time(0));
+
     string playerName;
     cout << "Enter your name: ";
     cin >> playerName;
-    srand(time(0));
-    Setup();
-    while (!gameOver) {
-        Draw(playerName);
-        Input();
-        Logic();
-        usleep(100000);
+
+    sf::RenderWindow window(sf::VideoMode((width + 2) * 20, (height + 3) * 20), "Snake Game with SFML");
+    sf::Font font;
+    if (!font.loadFromFile("/Users/victorialoziak/Downloads/Arial/ARIAL.TTF")) {
+        cout << "Could not load font!" << endl;
+        return -1;
     }
+
+    Setup();
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            HandleInput(event);
+        }
+
+        if (!isPaused && !gameOver) {
+            GameEngine();
+            RenderingEngine(window, font, playerName);
+            sf::sleep(sf::milliseconds(100));
+        }
+    }
+
+    cout << "Game Over! Your score: " << score << endl;
     return 0;
 }
