@@ -2,11 +2,7 @@
 #include "GameEngine.h"
 
 int main() {
-    std::string playerName;
-    std::cout << "Enter your name: ";
-    std::cin >> playerName;
-
-    GameEngine game(playerName);
+    GameEngine game;
     game.Run();
 
     return 0;

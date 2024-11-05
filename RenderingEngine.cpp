@@ -2,7 +2,67 @@
 #include <iostream>
 
 RenderingEngine::RenderingEngine(sf::RenderWindow& window, const sf::Font& font)
-    : window(window), font(font) {}
+: window(window), font(font) {
+    titleText.setFont(font);
+    titleText.setString("Snake");
+    titleText.setCharacterSize(50);
+    titleText.setFillColor(sf::Color::Red);
+    titleText.setPosition(500, 315);
+
+    startText.setFont(font);
+    startText.setString("Start Game");
+    startText.setCharacterSize(30);
+    startText.setPosition(200, 200);
+
+    exitText.setFont(font);
+    exitText.setString("Exit");
+    exitText.setCharacterSize(30);
+    exitText.setPosition(200, 250);
+}
+
+void RenderingEngine::ShowMenu(int selectedOption, const std::string& playerName) {
+    window.clear();
+
+    sf::Text title("Snake Game", font, 50);
+    title.setPosition(400, 50);
+    window.draw(title);
+
+    sf::Text name("Player: " + playerName, font, 30);
+    name.setPosition(400, 150);
+    window.draw(name);
+
+    std::string startText = (selectedOption == 0) ? "> Start Game <" : "Start Game";
+    std::string exitText = (selectedOption == 1) ? "> Exit <" : "Exit";
+
+    sf::Text startOption(startText, font, 30);
+    startOption.setPosition(400, 250);
+    window.draw(startOption);
+
+    sf::Text exitOption(exitText, font, 30);
+    exitOption.setPosition(400, 300);
+    window.draw(exitOption);
+
+    window.display();
+}
+
+void RenderingEngine::ShowGameOver(int score, const std::string& playerName) {
+    window.clear();
+
+    sf::Text gameOverText("GAME OVER", font, 50);
+    gameOverText.setPosition(400, 50);
+    window.draw(gameOverText);
+
+    sf::Text scoreText("Score: " + std::to_string(score), font, 30);
+    scoreText.setPosition(400, 150);
+    window.draw(scoreText);
+
+    sf::Text retryText("Press Enter to Try Again", font, 30);
+    retryText.setPosition(400, 250);
+    window.draw(retryText);
+
+    window.display();
+}
+
 
 void RenderingEngine::Render(const Snake& snake, const std::vector<Fruit>& fruits, const std::vector<Bomb>& bombs, int score){
     window.clear();

@@ -11,12 +11,11 @@ public:
     void Move();
     void HandleInput(sf::Event& event);
     void Draw(sf::RenderWindow& window) const;
-    bool IsGameOver() const;
+    bool HasSelfCollision() const;
     bool Eat(const sf::Vector2i& fruitPos);
     bool Trigger(const sf::Vector2i& bombPos);
     std::vector<sf::Vector2i> GetTail() const;
     int GetTailLength() const;
-    bool gameOver;
 
 private:
     int width, height;

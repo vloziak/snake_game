@@ -3,12 +3,11 @@
 #include <ctime>
 
 Snake::Snake(int width, int height)
-    : width(width), height(height), gameOver(false), nTail(0), dir(STOP) {
+    : width(width), height(height), nTail(0), dir(STOP) {
     srand(static_cast<unsigned>(time(0)));
 }
 
 void Snake::Setup() {
-    gameOver = false;
     dir = STOP;
     x = width / 2;
     y = height / 2;
@@ -34,12 +33,15 @@ void Snake::Move() {
 
     if (x >= width) x = 0; else if (x < 0) x = width - 1;
     if (y >= height) y = 0; else if (y < 0) y = height - 1;
+}
 
+bool Snake::HasSelfCollision() const {
     for (const auto& segment : tail) {
         if (segment.x == x && segment.y == y) {
-            gameOver = true;
+            return true;
         }
     }
+    return false;
 }
 
 void Snake::HandleInput(sf::Event& event) {
@@ -49,7 +51,6 @@ void Snake::HandleInput(sf::Event& event) {
             case sf::Keyboard::D: dir = RIGHT; break;
             case sf::Keyboard::W: dir = UP; break;
             case sf::Keyboard::S: dir = DOWN; break;
-            case sf::Keyboard::Escape: gameOver = true; break;
             default: break;
         }
     }
@@ -69,10 +70,6 @@ void Snake::Draw(sf::RenderWindow& window) const{
     }
 }
 
-bool Snake::IsGameOver() const {
-    return gameOver;
-}
-
 bool Snake::Eat(const sf::Vector2i& fruitPos) {
     if (x == fruitPos.x && y == fruitPos.y) {
         nTail++;
@@ -81,10 +78,13 @@ bool Snake::Eat(const sf::Vector2i& fruitPos) {
     return false;
 }
 
+
 bool Snake::Trigger(const sf::Vector2i& bombPos) {
     if (x == bombPos.x && y == bombPos.y) {
-        tail.pop_back();
-        nTail--;
+        if (!tail.empty()) {
+            tail.pop_back();
+            nTail = std::max(0, nTail - 1);
+        }
         return true;
     }
     return false;

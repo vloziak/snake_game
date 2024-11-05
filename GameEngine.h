@@ -9,24 +9,42 @@
 #include <vector>
 #include <iostream>
 
+enum class GameState {
+    MENU,
+    PLAYING,
+    GAME_OVER
+};
 
 class GameEngine {
 public:
-    GameEngine(const std::string& playerName);
+    GameEngine();
     void Run();
-    void Setup();
-    void HandleInput(sf::Event& event);
-    void Update();
-    bool IsGameOver() const;
 
 private:
+    void HandleMenuInput(sf::Event& event);
+    void HandlePlayingInput(sf::Event& event);
+    void HandleGameOverInput(sf::Event& event);
+
+    void Update();
+    void ShowMenu(int selectedOption, const std::string& playerName);
+    void ShowGameOver(int score, const std::string& playerName);
+    void StartGame();
+    void ResetGame();
+    bool IsGameOver() const;
+    void Setup();
+
+
+    GameState state;
     sf::RenderWindow window;
     sf::Font font;
     Snake snake;
     std::vector<Fruit> fruits;
     std::vector<Bomb> bombs;
+    bool gameOver;
     bool isPaused;
     int score;
+    std::string playerName;
+    int selectedOption;
 };
 
 #endif // GAMEENGINE_H

@@ -9,11 +9,16 @@ public:
     Bomb(int width, int height);
     void Spawn(const std::vector<sf::Vector2i>& tail);
     void Draw(sf::RenderWindow& window) const;
+    void Move();
     sf::Vector2i GetPosition() const;
+
 
 private:
     int width, height;
     sf::Vector2i position;
+    sf::Vector2i direction;
+    float speed;
+    sf::Clock changeDirectionTimer;
 };
 
 #endif // BOMB_H
