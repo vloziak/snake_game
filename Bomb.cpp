@@ -26,8 +26,8 @@ void Bomb::Spawn(const std::vector<sf::Vector2i>& tail) {
 }
 
 void Bomb::Draw(sf::RenderWindow& window) const {
-    sf::RectangleShape bomb(sf::Vector2f(25, 25));
-    bomb.setFillColor(sf::Color::Green);
+    sf::RectangleShape bomb(sf::Vector2f(30, 30));
+    bomb.setFillColor(sf::Color::Yellow);
     bomb.setPosition((position.x + 1) * 20, (position.y + 1) * 20);
     window.draw(bomb);
 }

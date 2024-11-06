@@ -86,7 +86,7 @@ void GameEngine::Run() {
 
             break;
             case GameState::GAME_OVER:
-                renderer.ShowGameOver(gameOverBackgroundSprite, score, playerName);
+                renderer.ShowGameOver(gameOverBackgroundSprite, score, playerName, selectedOption);
             break;
         }
     }
@@ -131,11 +131,24 @@ void GameEngine::HandlePlayingInput(sf::Event& event) {
 
 void GameEngine::HandleGameOverInput(sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Enter) {
-            ResetGame();
+        if (event.key.code == sf::Keyboard::Left) {
+            selectedOption = (selectedOption - 1 + 2) % 2;
+        } else if (event.key.code == sf::Keyboard::Right) {
+            selectedOption = (selectedOption + 1) % 2;
+        } else if (event.key.code == sf::Keyboard::Enter) {
+            if (selectedOption == 0) {
+                ResetGame();
+                state = GameState::PLAYING;
+                StartGame();
+            } else if (selectedOption == 1) {
+                ResetGame();
+                playerName.clear();
+                state = GameState::MENU;
+            }
         }
     }
 }
+
 
 void GameEngine::Update() {
     snake.Move();
@@ -165,7 +178,7 @@ void GameEngine::Update() {
 
 void GameEngine::StartGame() {
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 15; ++i) {
         Fruit newFruit(46, 30, fruitTexture);
         newFruit.Spawn(snake.GetTail());
         fruits.push_back(newFruit);
@@ -184,8 +197,6 @@ void GameEngine::ResetGame() {
     fruits.clear();
     bombs.clear();
     score = 0;
-    playerName.clear();
-    state = GameState::MENU; //
 }
 
 bool GameEngine::IsGameOver() const {

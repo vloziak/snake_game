@@ -24,7 +24,7 @@ void Fruit::Spawn(const std::vector<sf::Vector2i>& tail) {
 
 
 void Fruit::Draw(sf::RenderWindow& window) const{
-    sf::RectangleShape bomb(sf::Vector2f(25, 25));
+    sf::RectangleShape bomb(sf::Vector2f(30, 30));
     bomb.setFillColor(sf::Color::Magenta);
     bomb.setPosition((position.x + 1) * 20, (position.y + 1) * 20);
     window.draw(bomb);

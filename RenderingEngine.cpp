@@ -50,8 +50,7 @@ void RenderingEngine::ShowMenu(const sf::Sprite& menuBackgroundSprite, int selec
 
     window.display();
 }
-
-void RenderingEngine::ShowGameOver(const sf::Sprite& gameOverBackgroundSprite,int score, const std::string& playerName) {
+void RenderingEngine::ShowGameOver(const sf::Sprite& gameOverBackgroundSprite, int score, const std::string& playerName, int selectedOption) {
     window.clear();
     window.draw(gameOverBackgroundSprite);
 
@@ -60,15 +59,25 @@ void RenderingEngine::ShowGameOver(const sf::Sprite& gameOverBackgroundSprite,in
     gameOverText.setPosition((window.getSize().x - gameOverBounds.width) / 2, 180);
     window.draw(gameOverText);
 
-    sf::Text scoreText( "Score: " + std::to_string(score), font, 25);
+    sf::Text scoreText(playerName + "'s Score: " + std::to_string(score), font, 25);
     sf::FloatRect scoreBounds = scoreText.getLocalBounds();
-    scoreText.setPosition((window.getSize().x - scoreBounds.width) / 2, 350);
+    scoreText.setPosition((window.getSize().x - scoreBounds.width) / 2, 250);
     window.draw(scoreText);
 
-    sf::Text retryText("Press Enter to Try Again", font, 25);
+    sf::Text retryText("Do you want to try again?", font, 25);
     sf::FloatRect retryBounds = retryText.getLocalBounds();
-    retryText.setPosition((window.getSize().x - retryBounds.width) / 2, 450);
+    retryText.setPosition((window.getSize().x - retryBounds.width) / 2, 350);
     window.draw(retryText);
+
+    sf::Text yesText("Yes", font, 25);
+    yesText.setFillColor(selectedOption == 0 ? sf::Color::Yellow : sf::Color::White);
+    yesText.setPosition((window.getSize().x / 2) - 50, 450);
+    window.draw(yesText);
+
+    sf::Text noText("No", font, 25);
+    noText.setFillColor(selectedOption == 1 ? sf::Color::Yellow : sf::Color::White);
+    noText.setPosition((window.getSize().x / 2) + 50, 450);
+    window.draw(noText);
 
     window.display();
 }

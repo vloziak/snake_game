@@ -57,13 +57,13 @@ void Snake::HandleInput(sf::Event& event) {
 }
 
 void Snake::Draw(sf::RenderWindow& window) const{
-    sf::RectangleShape snakeHead(sf::Vector2f(25, 25));
+    sf::RectangleShape snakeHead(sf::Vector2f(30, 30));
     snakeHead.setFillColor(sf::Color::Red);
     snakeHead.setPosition((x + 1) * 20, (y + 1) * 20);
     window.draw(snakeHead);
 
     for (const auto& segment : tail) {
-        sf::RectangleShape tailSegment(sf::Vector2f(25, 25));
+        sf::RectangleShape tailSegment(sf::Vector2f(30, 30));
         tailSegment.setFillColor(sf::Color::Black);
         tailSegment.setPosition((segment.x + 1) * 20, (segment.y + 1) * 20);
         window.draw(tailSegment);

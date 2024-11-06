@@ -14,7 +14,7 @@ public:
     sf::FloatRect getStartTextBounds() const;
     sf::FloatRect getExitTextBounds() const;
     void ShowMenu(const sf::Sprite& menuBackgroundSprite, int selectedOption, const std::string& playerName);
-    void ShowGameOver(const sf::Sprite& gameOverBackgroundSprite,int score, const std::string& playerName);
+    void ShowGameOver(const sf::Sprite& gameOverBackgroundSprite, int score, const std::string& playerName, int selectedOption);
 
 private:
     sf::RenderWindow& window;
