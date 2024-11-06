@@ -20,6 +20,7 @@ public:
     GameEngine();
     void Run();
 
+
 private:
     void HandleMenuInput(sf::Event& event);
     void HandlePlayingInput(sf::Event& event);
@@ -45,6 +46,17 @@ private:
     int score;
     std::string playerName;
     int selectedOption;
+
+    sf::Texture fruitTexture;
+    sf::Texture bombTexture;
+
+    sf::Texture menuBackgroundTexture;
+    sf::Texture gameBackgroundTexture;
+    sf::Texture gameOverBackgroundTexture;
+
+    sf::Sprite menuBackgroundSprite;
+    sf::Sprite gameBackgroundSprite;
+    sf::Sprite gameOverBackgroundSprite;
 };
 
 #endif // GAMEENGINE_H

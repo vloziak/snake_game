@@ -2,7 +2,7 @@
 
 
 GameEngine::GameEngine()
-    : window(sf::VideoMode(1000, 645), "Snake"),
+    : window(sf::VideoMode(736, 736), "Snake"),
       state(GameState::MENU),
       snake(50, 32),
       isPaused(false),
@@ -10,10 +10,36 @@ GameEngine::GameEngine()
       selectedOption(0),
       score(0) {
 
-    if (!font.loadFromFile("/Users/victorialoziak/Downloads/Arial/ARIAL.TTF")) {
+    if (!font.loadFromFile("/Users/victorialoziak/Downloads/Press_Start_2P/PressStart2P-Regular.ttf")) {
         std::cout << "Could not load font!" << std::endl;
         exit(-1);
     }
+
+    if (!menuBackgroundTexture.loadFromFile("/Users/victorialoziak/Downloads/img2.jpeg")) {
+        std::cout << "Could not load menu background image!" << std::endl;
+        exit(-1);
+    }
+    if (!gameBackgroundTexture.loadFromFile("/Users/victorialoziak/Downloads/6.jpeg")) {
+        std::cout << "Could not load game background image!" << std::endl;
+        exit(-1);
+    }
+    if (!gameOverBackgroundTexture.loadFromFile("/Users/victorialoziak/Downloads/img2.jpeg")) {
+        std::cout << "Could not load game over background image!" << std::endl;
+        exit(-1);
+    }
+
+    if (!fruitTexture.loadFromFile("/Users/victorialoziak/Downloads/img10.png")) {
+        std::cerr << "Could not load fruit image!" << std::endl;
+        exit(-1);
+    }
+    if (!bombTexture.loadFromFile("/Users/victorialoziak/Downloads/img11.png")) {
+        std::cerr << "Could not load bomb image!" << std::endl;
+        exit(-1);
+    }
+
+    menuBackgroundSprite.setTexture(menuBackgroundTexture);
+    gameBackgroundSprite.setTexture(gameBackgroundTexture);
+    gameOverBackgroundSprite.setTexture(gameOverBackgroundTexture);
 }
 
 void GameEngine::Setup() {
@@ -48,17 +74,19 @@ void GameEngine::Run() {
                 break;
             }
         }
+
         switch (state) {
             case GameState::PLAYING:
                 Update();
-                renderer.Render(snake, fruits, bombs, score);
+                renderer.Render(gameBackgroundSprite, snake, fruits, bombs, score);
                 sf::sleep(sf::milliseconds(100));
             break;
             case GameState::MENU:
-                renderer.ShowMenu(selectedOption, playerName);
+                renderer.ShowMenu(menuBackgroundSprite, selectedOption, playerName);
+
             break;
             case GameState::GAME_OVER:
-                renderer.ShowGameOver(score, playerName);
+                renderer.ShowGameOver(gameOverBackgroundSprite, score, playerName);
             break;
         }
     }
@@ -136,17 +164,19 @@ void GameEngine::Update() {
 }
 
 void GameEngine::StartGame() {
-    for (int i = 0; i < 5; ++i) {
-        Fruit newFruit(50, 32);
+
+    for (int i = 0; i < 10; ++i) {
+        Fruit newFruit(46, 30, fruitTexture);
         newFruit.Spawn(snake.GetTail());
         fruits.push_back(newFruit);
     }
 
-    for (int i = 0; i < 3; ++i) {
-        Bomb newBomb(50, 32);
+    for (int i = 0; i < 5; ++i) {
+        Bomb newBomb(46, 30, bombTexture);
         newBomb.Spawn(snake.GetTail());
         bombs.push_back(newBomb);
     }
+
     Setup();
 }
 

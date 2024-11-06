@@ -1,8 +1,9 @@
 #include "Bomb.h"
 #include <cstdlib>
 
-Bomb::Bomb(int width, int height)
+Bomb::Bomb(int width, int height, const sf::Texture& texture)
     : width(width), height(height), speed(1.0f), direction(1, 0) {
+    sprite.setTexture(texture);
     Spawn({});
 }
 sf::Vector2i Bomb::GetPosition() const {
@@ -25,7 +26,7 @@ void Bomb::Spawn(const std::vector<sf::Vector2i>& tail) {
 }
 
 void Bomb::Draw(sf::RenderWindow& window) const {
-    sf::RectangleShape bomb(sf::Vector2f(20, 20));
+    sf::RectangleShape bomb(sf::Vector2f(25, 25));
     bomb.setFillColor(sf::Color::Green);
     bomb.setPosition((position.x + 1) * 20, (position.y + 1) * 20);
     window.draw(bomb);
